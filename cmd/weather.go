@@ -5,6 +5,9 @@ package cmd
 
 import (
 	"fmt"
+	"io"
+	"log"
+	"net/http"
 
 	"github.com/spf13/cobra"
 )
@@ -20,7 +23,7 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("weather called")
+		fmt.Println(getWeatherData())
 	},
 }
 
@@ -36,4 +39,19 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// weatherCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func getWeatherData() string {
+	resp, err := http.Get("https://api.openweathermap.org/data/2.5/weather?lat=39.204940&lon=-94.532330&appid=a11b399e4f8fdd7a61fa5874d06c142e")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	sb := string(body)
+	return sb
 }
