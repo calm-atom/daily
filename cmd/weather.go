@@ -22,13 +22,15 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(getWeatherData())
-	},
+
+	Run: weatherData,
 }
 
 func init() {
 	rootCmd.AddCommand(weatherCmd)
+	weatherCmd.Flags().StringP("key", "k", "none", "Open weather api key")
+
+	//weatherCmd.Flags().StringP("key", "k")
 
 	// Here you will define your flags and configuration settings.
 
@@ -41,17 +43,29 @@ func init() {
 	// weatherCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func getWeatherData() string {
-	resp, err := http.Get("https://api.openweathermap.org/data/2.5/weather?lat=39.204940&lon=-94.532330&appid=a11b399e4f8fdd7a61fa5874d06c142e")
+func weatherData(cmd *cobra.Command, args []string) {
+	key, _ := cmd.Flags().GetString("key")
+	url := "https://api.openweathermap.org/data/2.5/weather?lat=39.204940&lon=-94.532330&appid=" + key
+	resp, err := http.Get(url)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	sb := string(body)
-	return sb
+
+	fmt.Println(sb)
 }
+
+// func getWeatherData(api_key string) string {
+// 	get_url := ("https://api.openweathermap.org/data/2.5/weather?lat=39.204940&lon=-94.532330&appid=%s", api_key)
+// 	resp, err := http.Get("https://api.openweathermap.org/data/2.5/weather?lat=39.204940&lon=-94.532330&appid=%s", api_key)
+// 	if err != nil {
+// 		log.Fatalln(err)
+// 	}
+//
+// 	return sb
+// }
